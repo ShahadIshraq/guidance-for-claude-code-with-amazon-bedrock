@@ -8,8 +8,30 @@ This directory contains optional Rust reimplementations of the Python `credentia
 
 - **credential-provider**: OIDC authentication and AWS credential provider
 - **otel-helper**: OpenTelemetry headers generator from JWT tokens
-- **Performance**: 5-10x faster startup, 5-10x lower memory usage
+- **Performance**: Up to 321x faster execution, up to 91% less memory usage
 - **Compatibility**: Uses identical config.json format, same CLI arguments
+
+## Performance Benchmarks
+
+Real-world benchmark results comparing Rust vs Python implementations. Benchmarks measured using macOS `/usr/bin/time -l` for execution time and peak RSS (Resident Set Size) memory usage, averaged over 5 iterations.
+
+### credential-provider
+
+| Metric | Python | Rust | Improvement |
+|--------|--------|------|-------------|
+| **Execution Time** | 1.2840s | 0.0040s | **321x faster** |
+| **Memory Usage** | 53.79 MB | 4.76 MB | **91% reduction** |
+| **Binary Size** | 29 MB | 20 MB | **31% smaller** |
+
+### otel-helper
+
+| Metric | Python | Rust | Improvement |
+|--------|--------|------|-------------|
+| **Execution Time** | 0.3720s | 0.0180s | **21x faster** |
+| **Memory Usage** | 25.04 MB | 5.79 MB | **76% reduction** |
+| **Binary Size** | 8.7 MB | 2.4 MB | **72% smaller** |
+
+**Benchmark methodology**: Measured execution time via `/usr/bin/time -l`, capturing real time and maximum resident set size. Tests run `--version` flag for credential-provider and `--test` flag for otel-helper to ensure complete initialization without external dependencies.
 
 ## Prerequisites
 
@@ -40,7 +62,7 @@ cargo build --release
 
 # Install (replaces Python binaries)
 cp target/release/credential-provider ~/claude-code-with-bedrock/credential-process
-cp target/release/otel-helper ~/claude-code-with-bedrock/otel-headers
+cp target/release/otel-helper ~/claude-code-with-bedrock/otel-helper
 ```
 
 ### Windows
@@ -51,7 +73,7 @@ cargo build --release
 
 # Install (replaces Python binaries)
 copy target\release\credential-provider.exe %USERPROFILE%\claude-code-with-bedrock\credential-process.exe
-copy target\release\otel-helper.exe %USERPROFILE%\claude-code-with-bedrock\otel-headers.exe
+copy target\release\otel-helper.exe %USERPROFILE%\claude-code-with-bedrock\otel-helper.exe
 ```
 
 **Note**: The `.sh` scripts are for Linux/macOS only. Windows users should run the `cargo` commands directly as shown above.
@@ -96,7 +118,7 @@ mkdir dist\windows-x86_64
 
 # Copy binaries
 copy target\release\credential-provider.exe dist\windows-x86_64\credential-process.exe
-copy target\release\otel-helper.exe dist\windows-x86_64\otel-headers.exe
+copy target\release\otel-helper.exe dist\windows-x86_64\otel-helper.exe
 
 # Create zip archive
 Compress-Archive -Path dist\windows-x86_64 -DestinationPath dist\claude-code-rust-windows-x86_64-1.0.0.zip

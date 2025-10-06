@@ -36,9 +36,9 @@ elif [ -f "target/release/credential-provider.exe" ]; then
 fi
 
 if [ -f "target/release/otel-helper" ]; then
-    cp target/release/otel-helper "$DIST_DIR/$PLATFORM/otel-headers"
+    cp target/release/otel-helper "$DIST_DIR/$PLATFORM/otel-helper"
 elif [ -f "target/release/otel-helper.exe" ]; then
-    cp target/release/otel-helper.exe "$DIST_DIR/$PLATFORM/otel-headers.exe"
+    cp target/release/otel-helper.exe "$DIST_DIR/$PLATFORM/otel-helper.exe"
 fi
 
 # Create tarball
