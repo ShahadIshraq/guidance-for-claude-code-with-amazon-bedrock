@@ -1,0 +1,39 @@
+[package]
+name = "credential-provider"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "credential-provider"
+path = "src/main.rs"
+
+[dependencies]
+shared = { path = "../shared" }
+reqwest.workspace = true
+tokio.workspace = true
+axum.workspace = true
+tower.workspace = true
+aws-config.workspace = true
+aws-sdk-cognitoidentity.workspace = true
+aws-sdk-sts.workspace = true
+keyring.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+env_logger.workspace = true
+log.workspace = true
+simplelog.workspace = true
+chrono.workspace = true
+url.workspace = true
+urlencoding.workspace = true
+rand.workspace = true
+base64.workspace = true
+sha2.workspace = true
+dirs.workspace = true
+jsonwebtoken.workspace = true
+webbrowser.workspace = true
+socket2.workspace = true
+libc.workspace = true
