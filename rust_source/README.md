@@ -140,25 +140,25 @@ The project is organized as a Cargo workspace with three crates:
 ### Crates
 
 1. **shared** - Common library
-   - `url_validation.rs`: Secure provider detection (ports Python implementation)
    - `jwt.rs`: JWT parsing utilities
    - `config.rs`: Configuration types
    - `error.rs`: Common error types
+   - `logging.rs`: Shared logging utilities
 
 2. **credential-provider** - Main authentication binary
    - `config.rs`: Configuration loading and provider detection
    - `storage.rs`: Keyring/session file credential storage
-   - `oidc.rs`: OAuth2 PKCE flow (placeholder)
-   - `aws.rs`: AWS credential federation (placeholder)
-   - `concurrency.rs`: Port-based locking (placeholder)
+   - `oidc.rs`: OAuth2 PKCE flow with callback server
+   - `aws.rs`: AWS credential federation via Cognito Identity Pool
+   - `concurrency.rs`: Port-based locking for safe concurrent authentication
+   - `logging.rs`: File-based debug logging
 
 3. **otel-helper** - Telemetry helper binary
    - `jwt.rs`: JWT decoding
    - `attributes.rs`: User attribute extraction with privacy hashing
    - `headers.rs`: HTTP header formatting
    - `token.rs`: Token retrieval via subprocess
-
-**Note**: Some modules are currently placeholders. The full implementation includes OIDC flows, AWS SDK integration, and OAuth callback servers.
+   - `logging.rs`: File-based debug logging
 
 ## Configuration
 
@@ -211,13 +211,6 @@ On Windows, use `otel-helper.exe` instead.
 
 **Debug Logging**: When using the `--verbose` flag, detailed debug logs are written to `~/claude-code-with-bedrock/logs/otel-helper.log` (or `%USERPROFILE%\claude-code-with-bedrock\logs\otel-helper.log` on Windows). The `--test` flag shows detailed output to stderr for quick verification, while `--verbose` provides persistent file-based logging for troubleshooting.
 
-## Performance Comparison
-
-| Metric | Python | Rust | Improvement |
-|--------|--------|------|-------------|
-| Startup time | ~500-800ms | ~50-100ms | 5-10x faster |
-| Memory usage | ~50-80MB | ~5-10MB | 5-10x lower |
-| Binary size | Python + deps | ~8-12MB | Standalone |
 
 ## Development
 
@@ -251,92 +244,3 @@ Then reference in individual crate `Cargo.toml`:
 [dependencies]
 new-crate.workspace = true
 ```
-
-## Troubleshooting
-
-### macOS Keychain Permissions
-
-Same behavior as Python version - macOS may prompt for keychain access on first use.
-
-### Windows Credential Manager
-
-The Rust version handles Windows' 2560-byte credential limit the same way as Python (credential splitting).
-
-### Build Errors
-
-**Error: Rust version too old**
-```bash
-rustup update stable
-```
-
-**Error: Missing dependencies on Linux**
-```bash
-# Ubuntu/Debian
-sudo apt-get install build-essential pkg-config libssl-dev
-
-# RHEL/CentOS
-sudo yum groupinstall "Development Tools"
-sudo yum install openssl-devel
-```
-
-**Error: Compilation fails on Windows**
-
-Make sure you have the Visual C++ build tools installed:
-- Download from: https://visualstudio.microsoft.com/downloads/
-- Select "Desktop development with C++"
-
-### Cross-Compilation (Advanced)
-
-To build for other platforms:
-
-```bash
-# Add target
-rustup target add x86_64-unknown-linux-gnu
-rustup target add x86_64-apple-darwin
-rustup target add aarch64-apple-darwin
-
-# Build for specific target
-cargo build --release --target x86_64-unknown-linux-gnu
-```
-
-**Note**: Cross-compilation may require additional tools. For Windows builds from Linux/macOS, consider using `cross`:
-
-```bash
-cargo install cross
-cross build --release --target x86_64-pc-windows-gnu
-```
-
-## File Locations
-
-After installation:
-
-**Linux / macOS**:
-- Binaries:
-  - `~/claude-code-with-bedrock/credential-process`
-  - `~/claude-code-with-bedrock/otel-headers`
-- Debug Logs (when using `--verbose`):
-  - `~/claude-code-with-bedrock/logs/credential-provider.log`
-  - `~/claude-code-with-bedrock/logs/otel-helper.log`
-
-**Windows**:
-- Binaries:
-  - `%USERPROFILE%\claude-code-with-bedrock\credential-process.exe`
-  - `%USERPROFILE%\claude-code-with-bedrock\otel-headers.exe`
-- Debug Logs (when using `--verbose`):
-  - `%USERPROFILE%\claude-code-with-bedrock\logs\credential-provider.log`
-  - `%USERPROFILE%\claude-code-with-bedrock\logs\otel-helper.log`
-
-## Rollback to Python
-
-If you need to revert to the Python version:
-
-1. Remove Rust binaries
-2. Reinstall Python package: `poetry install` (from `source/` directory)
-3. Python binaries will be restored
-
-## Contributing
-
-- Follow Rust conventions and idioms
-- Add tests for new features
-- Run `cargo fmt` and `cargo clippy` before committing
-- Update this README for significant changes
